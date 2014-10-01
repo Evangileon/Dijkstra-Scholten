@@ -7,62 +7,87 @@
 		<machine>
 			<id>1</id>
 			<hostname>dc01.utdallas.edu</hostname>
+			<recvPort>44441</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>2</id>
 			<hostname>dc02.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>3</id>
 			<hostname>dc03.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>4</id>
 			<hostname>dc04.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>5</id>
 			<hostname>dc05.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>6</id>
 			<hostname>dc06.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>7</id>
 			<hostname>dc07.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>8</id>
 			<hostname>dc08.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>9</id>
 			<hostname>dc09.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>10</id>
 			<hostname>dc10.utdallas.edu</hostname>
+			<recvPort>44444</recvPort>
+			<sendPort>44442</sendPort>
 		</machine>
 		<machine>
 			<id>11</id>
 			<hostname>dc11.utdallas.edu</hostname>
+			<port>44444</port>
 		</machine>
 		<machine>
 			<id>12</id>
 			<hostname>dc12.utdallas.edu</hostname>
+			<port>44444</port>
 		</machine>
 		<machine>
 			<id>13</id>
 			<hostname>dc13.utdallas.edu</hostname>
+			<port>44444</port>
 		</machine>
 		<machine>
 			<id>14</id>
 			<hostname>dc14.utdallas.edu</hostname>
+			<port>44444</port>
 		</machine>
 		<machine>
 			<id>15</id>
 			<hostname>dc15.utdallas.edu</hostname>
+			<port>44444</port>
 		</machine>
 	</machines>
 </configs>

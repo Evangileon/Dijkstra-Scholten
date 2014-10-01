@@ -23,7 +23,7 @@ public class Process {
 
 	InetAddress processAddr;
 	int processRecvPort;
-	int processSendPort;
+	int processAcksPort;
 
 	Semaphore sem;
 	boolean isRealProcess;
@@ -48,11 +48,11 @@ public class Process {
 		this.allProcessList = allProcessList;
 	}
 
-	public Process(int id, InetAddress addr, int recvPort, int sendPort) {
+	public Process(int id, InetAddress addr, int recvPort, int acksPort) {
 		this.id = id;
 		processAddr = addr;
 		processRecvPort = recvPort;
-		processSendPort = sendPort;
+		processAcksPort = acksPort;
 		isRealProcess = false;
 	}
 
@@ -65,11 +65,11 @@ public class Process {
 	}
 
 	public int getProcessSendPort() {
-		return processSendPort;
+		return processAcksPort;
 	}
 
-	public void setProcessSendPort(int processSendPort) {
-		this.processSendPort = processSendPort;
+	public void setProcessAcksPort(int processAcksPort) {
+		this.processAcksPort = processAcksPort;
 	}
 
 	/**
@@ -114,12 +114,28 @@ public class Process {
 	public void run() {
 		RecvEntity recvEntity = new RecvEntity(processAddr, processRecvPort);
 		recvEntity.setProcess(this);
+		AcksEntity acksEntity = new AcksEntity(processAddr, processAcksPort);
+		acksEntity.setProcess(this);
 		Thread recvThread = new Thread(recvEntity);
+		Thread acksThread = new Thread(acksEntity);
+		
 		recvThread.start();
+		acksThread.start();
+		
+		
 		
 		if (!waitForAllProcessReady()) {
 			System.out.println("Timeout: some process not ready");
 			return;
 		}
+		
+		
+		try {
+			recvThread.join();
+			acksThread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 }

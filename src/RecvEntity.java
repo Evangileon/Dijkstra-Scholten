@@ -1,4 +1,5 @@
 /**
+ * Thread entity that receive computational message
  * @author Jun Yu
  */
 

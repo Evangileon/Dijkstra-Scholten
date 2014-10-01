@@ -28,7 +28,7 @@ public class Machine {
 
 	String hostname;
 	int recvPort;
-	int sendPort;
+	int acksPort;
 	
 	int id;
 	boolean isRealMachine;
@@ -60,7 +60,7 @@ public class Machine {
 	}
 	
 	public int getSendPort() {
-		return sendPort;
+		return acksPort;
 	}
 
 	private void parseXML(String filename) {
@@ -89,7 +89,7 @@ public class Machine {
 				int id = 0;
 				String hostname = null;
 				int recvPort = 0;
-				int sendPort = 0;
+				int acksPort = 0;
 
 				for (int j = 0; j < machineConfig.getLength(); j++) {
 					Node oneConfig = machineConfig.item(j);
@@ -102,11 +102,11 @@ public class Machine {
 					if(oneConfig.getNodeName().equals("recvPort")) {
 						recvPort = Integer.parseInt(oneConfig.getTextContent());
 					}
-					if(oneConfig.getNodeName().equals("sendPort")) {
-						sendPort = Integer.parseInt(oneConfig.getTextContent());
+					if(oneConfig.getNodeName().equals("acksPort")) {
+						acksPort = Integer.parseInt(oneConfig.getTextContent());
 					}
 				}
-				this.allMachineList.put(id, new Machine(id, hostname, recvPort, sendPort));
+				this.allMachineList.put(id, new Machine(id, hostname, recvPort, acksPort));
 			}
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
@@ -134,7 +134,7 @@ public class Machine {
 					this.hostname = localHostname;
 					this.id = oneMachine.getId();
 					this.recvPort = oneMachine.getRecvPort();
-					this.sendPort = oneMachine.getSendPort();
+					this.acksPort = oneMachine.getSendPort();
 					return;
 				}
 			}
@@ -178,7 +178,7 @@ public class Machine {
 		process.setId(this.getId());
 		process.setAllProcessList(allProcessList);
 		process.setProcessRecvPort(this.getRecvPort());
-		process.setProcessSendPort(this.getSendPort());
+		process.setProcessAcksPort(this.getSendPort());
 		process.run();
 	}
 

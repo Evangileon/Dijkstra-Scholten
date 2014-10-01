@@ -9,6 +9,7 @@ public class Message {
 	int senderId;
 	MessageType messageType;
 
+	
 	static enum MessageType {
 		COMPUTATION("COMPUTATION"), ACK("ACK"), READY("READY");
 
@@ -77,4 +78,22 @@ public class Message {
 		return messageType;
 	}
 	
+	public void setSenderId(int senderId) {
+		this.senderId = senderId;
+	}
+
+	public void setMessageType(MessageType messageType) {
+		this.messageType = messageType;
+	}
+	
+	public Message() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public static Message readyMessage(int senderId) {
+		Message message = new Message();
+		message.setSenderId(senderId);
+		message.setMessageType(MessageType.READY);
+		return message;
+	}
 }

@@ -37,6 +37,9 @@ public class RecvEntity implements Runnable {
 				if(message.isComputation()) {
 					
 				}
+				
+				input.close();
+				clientSock.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

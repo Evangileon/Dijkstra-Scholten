@@ -3,9 +3,13 @@
  * @author Jun Yu
  */
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 
 public class Process {
@@ -16,7 +20,7 @@ public class Process {
 
 	Process parent;
 	LinkedList<Process> childList;
-	LinkedList<Message> pendingAcks;
+	LinkedList<Integer> pendingAcks;
 
 	HashMap<Integer, Process> allProcessList;
 	boolean[] readyList;
@@ -30,6 +34,8 @@ public class Process {
 
 	public Process() {
 		isRealProcess = true;
+		childList = new LinkedList<>();
+		pendingAcks = new LinkedList<>();
 	}
 
 	public int getId() {
@@ -64,7 +70,7 @@ public class Process {
 		this.processRecvPort = processRecvPort;
 	}
 
-	public int getProcessSendPort() {
+	public int getProcessAcksPort() {
 		return processAcksPort;
 	}
 
@@ -107,8 +113,62 @@ public class Process {
 		return false;
 	}
 	
+	public InetAddress getProcessAddr() {
+		return processAddr;
+	}
+
 	public void setReady(int id) {
 		readyList[id] = true;
+	}
+	
+	/**
+	 * Send ready message to specific process
+	 * @param receiverId
+	 */
+	private void sendReady(int receiverId) {
+		Message ready = Message.readyMessage(this.id);
+		sendMessage(receiverId, ready);
+	}
+	
+	/**
+	 * Send ready message to all process, including itself
+	 */
+	private void sendReadyToAll() {
+		for (Entry<Integer, Process> pair : allProcessList.entrySet()) {
+			int receiverId = pair.getKey();
+			sendReady(receiverId);
+		}
+	}
+	
+	/**
+	 * Does the pending acks list contain the specific process
+	 * @param remoteId
+	 */
+	public boolean containPendingMessage(int remoteId) {
+		return pendingAcks.contains(remoteId);
+	}
+	
+	public void removeFromPendingAcks(int remoteId) {
+		pendingAcks.remove(Integer.valueOf(remoteId));
+	}
+	
+	/**
+	 * Send message so specific process
+	 * @param receiverId
+	 * @param message
+	 */
+	private void sendMessage(int receiverId, Message message) {
+		Process receiverProcess = allProcessList.get(receiverId);
+		try {
+			Socket sock = new Socket(receiverProcess.getProcessAddr(), receiverProcess.getProcessRecvPort());
+			DataOutputStream output = new DataOutputStream(sock.getOutputStream());
+			output.writeBytes(message.toString());
+			output.close();
+			sock.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {
@@ -122,12 +182,17 @@ public class Process {
 		recvThread.start();
 		acksThread.start();
 		
+		// Tell everyone that online that I am ready
+		sendReadyToAll();
 		
-		
+		// If wait for some process for too long, probably something wrong happens
 		if (!waitForAllProcessReady()) {
 			System.out.println("Timeout: some process not ready");
 			return;
 		}
+		
+		System.out.println("Everyone is ready: begin computational request");
+		// then go to business logic
 		
 		
 		try {

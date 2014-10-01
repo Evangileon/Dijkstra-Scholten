@@ -112,7 +112,7 @@ public class Process {
 	}
 
 	public void run() {
-		RecvThreadEntity recvEntity = new RecvThreadEntity(processAddr, processRecvPort);
+		RecvEntity recvEntity = new RecvEntity(processAddr, processRecvPort);
 		recvEntity.setProcess(this);
 		Thread recvThread = new Thread(recvEntity);
 		recvThread.start();

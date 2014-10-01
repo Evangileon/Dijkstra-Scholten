@@ -4,7 +4,7 @@
  *
  */
 
-public class SendThreadEntity implements Runnable {
+public class SendEntity implements Runnable {
 
 	@Override
 	public void run() {

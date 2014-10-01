@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
-public class RecvThreadEntity implements Runnable {
+public class RecvEntity implements Runnable {
 	ServerSocket recvSock;
 	InetAddress addr;
 	int port;
@@ -33,13 +33,16 @@ public class RecvThreadEntity implements Runnable {
 				if(message.isReady()) {
 					process.setReady(message.getSenderId());
 				}
+				if(message.isComputation()) {
+					
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public RecvThreadEntity(InetAddress addr, int port) {
+	public RecvEntity(InetAddress addr, int port) {
 		this.addr = addr;
 		this.port = port;
 		try {

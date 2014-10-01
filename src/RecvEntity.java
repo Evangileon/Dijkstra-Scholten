@@ -20,6 +20,21 @@ public class RecvEntity implements Runnable {
 	public void setProcess(Process process) {
 		this.process = process;
 	}
+	
+	private void handleComputationalMessage(Message message) {
+		int remoteId = message.getSenderId();
+		if(process.getSemState().tryAcquire()) {
+			// the process is idle
+			process.setParent(process.getAllProcessList().get(remoteId));
+			process.getSemState().release();
+			
+		} else {
+			// The process is in active
+			// then return ACK immediately
+			
+			process.sendAck(remoteId);
+		}
+	}
 
 	@Override
 	public void run() {
@@ -35,7 +50,7 @@ public class RecvEntity implements Runnable {
 					process.setReady(message.getSenderId());
 				}
 				if(message.isComputation()) {
-					
+					handleComputationalMessage(message);
 				}
 				
 				input.close();

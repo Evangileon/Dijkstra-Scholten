@@ -29,13 +29,14 @@ public class Process {
 	int processRecvPort;
 	int processAcksPort;
 
-	Semaphore sem;
+	Semaphore semState;
 	boolean isRealProcess;
 
 	public Process() {
 		isRealProcess = true;
 		childList = new LinkedList<>();
 		pendingAcks = new LinkedList<>();
+		semState = new Semaphore(1);
 	}
 
 	public int getId() {
@@ -44,6 +45,15 @@ public class Process {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+
+	public synchronized Process getParent() {
+		return parent;
+	}
+
+	public synchronized void setParent(Process parent) {
+		this.parent = parent;
 	}
 
 	public HashMap<Integer, Process> getAllProcessList() {
@@ -117,8 +127,36 @@ public class Process {
 		return processAddr;
 	}
 
+	public Semaphore getSemState() {
+		return semState;
+	}
+
 	public void setReady(int id) {
 		readyList[id] = true;
+	}
+	
+	/**
+	 * Send computational message to specific process
+	 * @param receiverId
+	 */
+	public void sendComputation(int receiverId) {
+		Message computation = Message.computationalMessage(this.id, this.localTime);
+		sendMessage(receiverId, computation);
+	}
+	
+	public void sendAck(int receiverId) {
+		Message ack = Message.ackMessage(this.id, this.localTime);
+		Process receiverProcess = allProcessList.get(receiverId);
+		try {
+			Socket sock = new Socket(receiverProcess.getProcessAddr(), receiverProcess.getProcessAcksPort());
+			DataOutputStream output = new DataOutputStream(sock.getOutputStream());
+			output.writeBytes(ack.toString());
+			output.close();
+			sock.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -199,7 +237,6 @@ public class Process {
 			recvThread.join();
 			acksThread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}

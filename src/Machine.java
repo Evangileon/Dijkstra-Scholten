@@ -63,6 +63,10 @@ public class Machine {
 		return acksPort;
 	}
 
+	/**
+	 * Parse XML to acquire hostname, ports of process
+	 * @param filename
+	 */
 	private void parseXML(String filename) {
 		allMachineList = new HashMap<>();
 
@@ -147,6 +151,12 @@ public class Machine {
 		}
 	}
 
+	/**
+	 * Parse the machine configs, and generate a list of virtual process,
+	 * so that the physical process running on this machine can easily
+	 * get information about other processes
+	 * @return
+	 */
 	private HashMap<Integer, Process> generateProcessList() {
 		HashMap<Integer, Process> allProcessList = new HashMap<>();
 
@@ -165,13 +175,17 @@ public class Machine {
 		return allProcessList;
 	}
 	
+	/**
+	 * Read configs from configs.xml and initialize the environmental variables
+	 */
 	public void initializeMachine() {
 		parseXML("configs.xml");
 		identifyItself();
 	}
 	
-	
-	
+	/**
+	 * Launch the process running on this machine
+	 */
 	public void launchProcess() {
 		HashMap<Integer, Process> allProcessList = generateProcessList();
 		Process process = new Process();

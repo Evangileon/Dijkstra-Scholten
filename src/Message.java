@@ -6,6 +6,7 @@
 
 public class Message {
 	int timeStamp;
+
 	int senderId;
 	MessageType messageType;
 
@@ -69,6 +70,10 @@ public class Message {
 	public int getTimeStamp() {
 		return timeStamp;
 	}
+	
+	public void setTimeStamp(int timeStamp) {
+		this.timeStamp = timeStamp;
+	}
 
 	public int getSenderId() {
 		return senderId;
@@ -94,6 +99,22 @@ public class Message {
 		Message message = new Message();
 		message.setSenderId(senderId);
 		message.setMessageType(MessageType.READY);
+		return message;
+	}
+	
+	public static Message computationalMessage(int senderId, int timeStamp) {
+		Message message = new Message();
+		message.setSenderId(senderId);
+		message.setTimeStamp(timeStamp);
+		message.setMessageType(MessageType.COMPUTATION);
+		return message;
+	}
+	
+	public static Message ackMessage(int senderId, int timeStamp) {
+		Message message = new Message();
+		message.setSenderId(senderId);
+		message.setTimeStamp(timeStamp);
+		message.setMessageType(MessageType.ACK);;
 		return message;
 	}
 }

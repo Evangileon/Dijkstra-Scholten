@@ -124,7 +124,7 @@ public class Process {
 				boolean areAllReady = true;
 				// zero index is dummy, so begin with 1
 				for (int j = 1; j < readyList.length; j++) {
-					if (readyList[i] == false) {
+					if (readyList[j] == false) {
 						areAllReady = false;
 						break;
 					}

@@ -47,6 +47,8 @@ public class Process {
 		numMessageReceivedAcks = 0;
 		numMessageGenerated = 0;
 		terminated = false;
+		
+		
 	}
 
 	public int getId() {
@@ -115,13 +117,6 @@ public class Process {
 	 * @return
 	 */
 	private boolean waitForAllProcessReady() {
-		readyList = new boolean[allProcessList.size() + 1];
-		for (int i = 0; i < readyList.length; i++) {
-			readyList[i] = false;
-		}
-		
-		// this process is always ready for itself
-		readyList[this.id] = true;
 
 		try {
 			for (int i = 0; i < READY_TIMEOUT; i++) {
@@ -284,6 +279,15 @@ public class Process {
 	}
 
 	public void run() {
+		System.out.println(this.allProcessList.size() + " processed in total");
+		readyList = new boolean[allProcessList.size() + 1];
+		for (int i = 0; i < readyList.length; i++) {
+			readyList[i] = false;
+		}
+		
+		// this process is always ready for itself
+		readyList[this.id] = true;
+		
 		RecvEntity recvEntity = new RecvEntity(processAddr, processRecvPort);
 		recvEntity.setProcess(this);
 		AcksEntity acksEntity = new AcksEntity(processAddr, processAcksPort);

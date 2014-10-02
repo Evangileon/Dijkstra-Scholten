@@ -81,6 +81,7 @@ public class Machine {
 			if (!doc.hasChildNodes()) {
 				System.exit(0);
 			}
+			doc.normalize();
 
 			// System.out.println(doc.getDocumentElement().getNodeName());
 			Node machines = doc.getElementsByTagName("machines").item(0);
@@ -89,6 +90,10 @@ public class Machine {
 
 			for (int i = 0; i < machineList.getLength(); i++) {
 				Node oneMachine = machineList.item(i);
+				if (oneMachine.getNodeType() != Node.ELEMENT_NODE) {
+					continue;
+				}
+				
 				NodeList machineConfig = oneMachine.getChildNodes();
 				int id = 0;
 				String hostname = null;
@@ -97,6 +102,10 @@ public class Machine {
 
 				for (int j = 0; j < machineConfig.getLength(); j++) {
 					Node oneConfig = machineConfig.item(j);
+					if(oneConfig.getNodeType() != Node.ELEMENT_NODE) {
+						continue;
+					}
+					
 					if (oneConfig.getNodeName().equals("id")) {
 						id = Integer.parseInt(oneConfig.getTextContent());
 					}

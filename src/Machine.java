@@ -139,6 +139,7 @@ public class Machine {
 					this.id = oneMachine.getId();
 					this.recvPort = oneMachine.getRecvPort();
 					this.acksPort = oneMachine.getSendPort();
+					Log.setLogFileName("f" + this.id);
 					return;
 				}
 			}

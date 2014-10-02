@@ -307,7 +307,7 @@ public class Process {
 		// happens
 		if (!waitForAllProcessReady()) {
 			System.out.println("Timeout: some process not ready");
-			return;
+			System.exit(0);;
 		}
 
 		System.out.println("Everyone is ready: begin computational request");

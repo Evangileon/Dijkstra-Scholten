@@ -20,6 +20,22 @@ public class AcksEntity implements Runnable {
 	public void setProcess(Process process) {
 		this.process = process;
 	}
+	
+	private boolean checkTermination() {
+		if(!process.getSemState().tryAcquire()) {
+			// process active, not terminated
+			return false;
+		}
+		
+		boolean terminated = false;
+		if(process.getPendingAcks().size() == 0) {
+			terminated = true;
+		} else {
+			terminated = false;
+		}
+		process.getSemState().release();
+		return terminated;
+	}
 
 	@Override
 	public void run() {
@@ -32,7 +48,22 @@ public class AcksEntity implements Runnable {
 				Message message = new Message(msg);
 				if (message.isAck()) {
 					if (process.containPendingMessage(message.getSenderId())) {
+						// remove from pending ACK list
 						process.removeFromPendingAcks(message.getSenderId());
+						// remove from child list
+						process.removeFromChildList(message.getSenderId());
+						Log.receiveAckMessage(message.getSenderId(), process.getNumMessageReceivedAcks());
+						
+						if(checkTermination()) {
+							// satisfy the termination condition for this process
+							// then send ACK to parent;
+							Process parent = process.getParent();
+							process.sendAck(parent.getId());
+							// detach from parent
+							process.setParent(null);
+							Log.sendAckToParentAndDetachFromTree(parent.getId());
+						}
+						
 					} else {
 						System.out
 								.println("Logical error: the process receives an Acks that is not in its pending list");
@@ -43,7 +74,6 @@ public class AcksEntity implements Runnable {
 				clientSock.close();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

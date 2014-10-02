@@ -26,12 +26,15 @@ public class RecvEntity implements Runnable {
 		if(process.getSemState().tryAcquire()) {
 			// the process is idle
 			process.setParent(process.getAllProcessList().get(remoteId));
+			Log.receiveComputationalMessage(remoteId, true);
+			// TODO then active process
+			
 			process.getSemState().release();
 			
 		} else {
 			// The process is in active
 			// then return ACK immediately
-			
+			Log.receiveComputationalMessage(remoteId, false);
 			process.sendAck(remoteId);
 		}
 	}
@@ -51,6 +54,10 @@ public class RecvEntity implements Runnable {
 				}
 				if(message.isComputation()) {
 					handleComputationalMessage(message);
+				}
+				if(message.isTermination()) {
+					Log.receiveTermination();
+					return;
 				}
 				
 				input.close();

@@ -12,7 +12,7 @@ public class Message {
 
 	
 	static enum MessageType {
-		COMPUTATION("COMPUTATION"), ACK("ACK"), READY("READY");
+		COMPUTATION("COMPUTATION"), ACK("ACK"), READY("READY"), TERMINATION("TERMINATION");
 
 		private final String name;
 
@@ -66,6 +66,10 @@ public class Message {
 	public boolean isReady() {
 		return (messageType == MessageType.READY);
 	}
+	
+	public boolean isTermination() {
+		return (messageType == MessageType.TERMINATION);
+	}
 
 	public int getTimeStamp() {
 		return timeStamp;
@@ -115,6 +119,12 @@ public class Message {
 		message.setSenderId(senderId);
 		message.setTimeStamp(timeStamp);
 		message.setMessageType(MessageType.ACK);;
+		return message;
+	}
+	
+	public static Message termMessage() {
+		Message message = new Message();
+		message.setMessageType(MessageType.TERMINATION);
 		return message;
 	}
 }

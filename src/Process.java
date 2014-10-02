@@ -47,8 +47,7 @@ public class Process {
 		numMessageReceivedAcks = 0;
 		numMessageGenerated = 0;
 		terminated = false;
-		
-		
+
 	}
 
 	public int getId() {
@@ -175,8 +174,7 @@ public class Process {
 		try {
 			Socket sock = new Socket(receiverProcess.getProcessAddr(),
 					receiverProcess.getProcessAcksPort());
-			PrintWriter output = new PrintWriter(
-					sock.getOutputStream());
+			PrintWriter output = new PrintWriter(sock.getOutputStream());
 			output.println(ack.toString());
 			output.close();
 			sock.close();
@@ -201,18 +199,18 @@ public class Process {
 	private void sendReadyToAll() {
 		for (Entry<Integer, Process> pair : allProcessList.entrySet()) {
 			int receiverId = pair.getKey();
-			if(receiverId == this.id) {
+			if (receiverId == this.id) {
 				continue;
 			}
 			sendReady(receiverId);
 		}
 	}
-	
+
 	private void sendTermination(int receiverId) {
 		Message term = Message.termMessage();
 		sendMessage(receiverId, term);
 	}
-	
+
 	public void sendTerminationToAll() {
 		for (Entry<Integer, Process> pair : allProcessList.entrySet()) {
 			int receiverId = pair.getKey();
@@ -240,7 +238,7 @@ public class Process {
 	public void addToChildList(int remoteId) {
 		childList.add(Integer.valueOf(remoteId));
 	}
-	
+
 	public void incrementNumMessageReceivedAcks() {
 		numMessageReceivedAcks++;
 	}
@@ -284,10 +282,10 @@ public class Process {
 		for (int i = 0; i < readyList.length; i++) {
 			readyList[i] = false;
 		}
-		
+
 		// this process is always ready for itself
 		readyList[this.id] = true;
-		
+
 		RecvEntity recvEntity = new RecvEntity(processAddr, processRecvPort);
 		recvEntity.setProcess(this);
 		AcksEntity acksEntity = new AcksEntity(processAddr, processAcksPort);
@@ -297,7 +295,7 @@ public class Process {
 
 		recvThread.start();
 		acksThread.start();
-		
+
 		try {
 			Thread.sleep(60 * 1000);
 		} catch (InterruptedException e) {
@@ -311,29 +309,26 @@ public class Process {
 		// happens
 		if (!waitForAllProcessReady()) {
 			System.out.println("Timeout: some process not ready");
-			System.exit(0);;
+			System.exit(0);
+			;
 		}
 
 		System.out.println("Everyone is ready: begin computational request");
 		// then go to business logic
-		if(id == 1) {
+		if (id == 1) {
 			// This is initiator
 			activateComputation();
 		}
-		
+
 		// this keep thread running in a loop
 		computationLoop();
-		
+
 		return;
 
 		/*
-		try {
-			recvThread.join();
-			acksThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		*/
+		 * try { recvThread.join(); acksThread.join(); } catch
+		 * (InterruptedException e) { e.printStackTrace(); }
+		 */
 	}
 
 	public void computationLoop() {
@@ -358,7 +353,9 @@ public class Process {
 					} else {
 						int pj = 0;
 						do {
-							pj = 1 + randProcess.nextInt(allProcessList.size()); // 1 + [0..14]
+							pj = 1 + randProcess.nextInt(allProcessList.size()); // 1
+																					// +
+																					// [0..14]
 						} while (pj == this.id); // until i != j
 
 						numMessageGenerated++;
@@ -375,19 +372,33 @@ public class Process {
 
 				// before go to idle, first check whether termination satisfied,
 				// that is, pending acks list is empty
-				if (receiveAllAcks()) {
-					incrementNumMessageReceivedAcks();
-					if (id == 1) {
-						goingToTerminate();
-						Log.determineTermination();
-						sendTerminationToAll();
+
+				boolean receiveAllAcks = false;
+				while (!receiveAllAcks) {
+					Thread.sleep(100);
+					// the process will keep checking whether all ACKs received
+					
+					if (getPendingAcks().size() == 0) {
+						receiveAllAcks = true;
 					} else {
-						// if not the initiator, send ack to parent
-						this.sendAck(parent.getId());
-						Log.sendAckToParentAndDetachFromTree(parent.getId());
-						this.setParent(null);
+						receiveAllAcks = false;
+					}
+
+					if (receiveAllAcks) {
+						incrementNumMessageReceivedAcks();
+						if (id == 1) {
+							goingToTerminate();
+						
+							sendTerminationToAll();
+						} else {
+							// if not the initiator, send ack to parent
+							this.sendAck(parent.getId());
+							Log.sendAckToParentAndDetachFromTree(parent.getId());
+							this.setParent(null);
+						}
 					}
 				}
+				
 				semState.release();
 				Log.fromActiveToIdle();
 
@@ -395,6 +406,8 @@ public class Process {
 				e.printStackTrace();
 			}
 		}
+		Log.determineTermination();
+		System.exit(0);
 	}
 
 	public void activateComputation() {

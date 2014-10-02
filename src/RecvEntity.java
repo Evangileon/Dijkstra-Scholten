@@ -59,13 +59,14 @@ public class RecvEntity implements Runnable {
 				if(message.isTermination()) {
 					process.goingToTerminate();
 					Log.receiveTermination();
-					return;
+					Thread.sleep(1000);
+					System.exit(0);
 				}
 				
 				input.close();
 				clientSock.close();
 			}
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

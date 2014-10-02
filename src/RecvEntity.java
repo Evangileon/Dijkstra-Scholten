@@ -45,8 +45,8 @@ public class RecvEntity implements Runnable {
 		try {	
 			while(!process.isTerminated()) {
 				Socket clientSock = recvSock.accept();
-				System.out.println("Just connected to "
-		                  + clientSock.getRemoteSocketAddress());
+				//System.out.println("Just connected to "
+		        //          + clientSock.getRemoteSocketAddress());
 				BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
 				String msg = input.readLine();
 				Message message = new Message(msg);

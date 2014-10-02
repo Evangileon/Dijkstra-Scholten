@@ -5,6 +5,7 @@
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -179,9 +180,9 @@ public class Process {
 		try {
 			Socket sock = new Socket(receiverProcess.getProcessAddr(),
 					receiverProcess.getProcessAcksPort());
-			DataOutputStream output = new DataOutputStream(
+			PrintWriter output = new PrintWriter(
 					sock.getOutputStream());
-			output.writeBytes(ack.toString());
+			output.println(ack.toString());
 			output.close();
 			sock.close();
 		} catch (IOException e) {

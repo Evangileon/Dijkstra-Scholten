@@ -3,8 +3,9 @@
  * @author Jun Yu
  */
 
-import java.io.DataInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -46,8 +47,8 @@ public class RecvEntity implements Runnable {
 				Socket clientSock = recvSock.accept();
 				System.out.println("Just connected to "
 		                  + clientSock.getRemoteSocketAddress());
-				DataInputStream input = new DataInputStream(clientSock.getInputStream());
-				String msg = input.readUTF();
+				BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
+				String msg = input.readLine();
 				Message message = new Message(msg);
 				if(message.isReady()) {
 					process.setReady(message.getSenderId());

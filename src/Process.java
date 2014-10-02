@@ -279,7 +279,7 @@ public class Process {
 	}
 
 	public void run() {
-		System.out.println(this.allProcessList.size() + " processed in total");
+		System.out.println(this.allProcessList.size() + " processes in total");
 		readyList = new boolean[allProcessList.size() + 1];
 		for (int i = 0; i < readyList.length; i++) {
 			readyList[i] = false;
@@ -358,7 +358,7 @@ public class Process {
 					} else {
 						int pj = 0;
 						do {
-							pj = 1 + randProcess.nextInt(15); // 1 + [0..14]
+							pj = 1 + randProcess.nextInt(allProcessList.size()); // 1 + [0..14]
 						} while (pj == this.id); // until i != j
 
 						numMessageGenerated++;

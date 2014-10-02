@@ -31,6 +31,7 @@ public class Log {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "Send computional message: ID of receiver: " + receiverId
 					+ " number of message received ACKs: " + num + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,6 +50,7 @@ public class Log {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "Receive computional message: ID of sender: " + senderId
 					+ " " + whether + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -60,6 +62,7 @@ public class Log {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "Receive ACK message: ID of sender: " + senderId
 					+ " number of message received ACKs: " + num + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,6 +73,7 @@ public class Log {
 		try {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "From Active to Idle." + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -80,6 +84,7 @@ public class Log {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "Sending ACK to parent and detaching from tree, parent: "
 					+ oldParent + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -90,6 +95,7 @@ public class Log {
 		try {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "Termination." + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -100,6 +106,7 @@ public class Log {
 		try {
 			instance().writer.write("[" + System.currentTimeMillis() + "] "
 					+ "Computation Terminated." + "\n");
+			instance().writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -75,6 +75,7 @@ public class RecvEntity implements Runnable {
 		this.port = port;
 		try {
 			recvSock = new ServerSocket(port);
+			System.out.println("message receive bind to " + port);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

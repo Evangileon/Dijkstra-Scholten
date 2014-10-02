@@ -35,10 +35,11 @@ public class Machine {
 
 	HashMap<Integer, Machine> allMachineList;
 
-	public Machine(int id, String hostname, int recvPort, int sendPort) {
+	public Machine(int id, String hostname, int recvPort, int acksPort) {
 
 		this.id = id;
 		this.recvPort = recvPort;
+		this.acksPort = acksPort;
 		this.hostname = hostname;
 		isRealMachine = false;
 	}
@@ -59,7 +60,7 @@ public class Machine {
 		return recvPort;
 	}
 	
-	public int getSendPort() {
+	public int getAcksPort() {
 		return acksPort;
 	}
 
@@ -147,8 +148,8 @@ public class Machine {
 					this.hostname = localHostname;
 					this.id = oneMachine.getId();
 					this.recvPort = oneMachine.getRecvPort();
-					this.acksPort = oneMachine.getSendPort();
-					Log.setLogFileName("f" + this.id);
+					this.acksPort = oneMachine.getAcksPort();
+					Log.setLogFileName("f" + this.id + ".txt");
 					return;
 				}
 			}
@@ -176,7 +177,8 @@ public class Machine {
 				int id = machine.getId();
 				InetAddress addr = InetAddress.getByName(machine.getHostname());
 				int recvPort = machine.getRecvPort();
-				allProcessList.put(id, new Process(id, addr, recvPort, 0));
+				int acksPort = machine.getAcksPort();
+				allProcessList.put(id, new Process(id, addr, recvPort, acksPort));
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -202,7 +204,7 @@ public class Machine {
 		process.setId(this.getId());
 		process.setAllProcessList(allProcessList);
 		process.setProcessRecvPort(this.getRecvPort());
-		process.setProcessAcksPort(this.getSendPort());
+		process.setProcessAcksPort(this.getAcksPort());
 		process.run();
 	}
 

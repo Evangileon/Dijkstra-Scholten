@@ -244,6 +244,10 @@ public class Process {
 	public void addToChildList(int remoteId) {
 		childList.add(Integer.valueOf(remoteId));
 	}
+	
+	public void incrementNumMessageReceivedAcks() {
+		numMessageReceivedAcks++;
+	}
 
 	public void goingToTerminate() {
 		terminated = true;
@@ -367,6 +371,7 @@ public class Process {
 				// before go to idle, first check whether termination satisfied,
 				// that is, pending acks list is empty
 				if (receiveAllAcks()) {
+					incrementNumMessageReceivedAcks();
 					if (id == 1) {
 						goingToTerminate();
 						Log.determineTermination();

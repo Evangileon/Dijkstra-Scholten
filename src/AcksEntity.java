@@ -58,6 +58,7 @@ public class AcksEntity implements Runnable {
 							// satisfy the termination condition for this process
 							// then send ACK to parent;
 							if(process.getId() == 1) {
+								process.incrementNumMessageReceivedAcks();
 								process.goingToTerminate();
 								Log.determineTermination();
 								process.sendTerminationToAll();
@@ -66,6 +67,7 @@ public class AcksEntity implements Runnable {
 								process.sendAck(parent.getId());
 								// detach from parent
 								process.setParent(null);
+								process.incrementNumMessageReceivedAcks();
 								Log.sendAckToParentAndDetachFromTree(parent.getId());
 							}
 						}

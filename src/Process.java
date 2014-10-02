@@ -33,15 +33,19 @@ public class Process {
 	int processAcksPort;
 
 	Semaphore semState;
+	Semaphore semAction;
 	boolean isRealProcess;
+	boolean terminated;
 
 	public Process() {
 		isRealProcess = true;
 		childList = new LinkedList<>();
 		pendingAcks = new LinkedList<>();
 		semState = new Semaphore(1);
+		semAction = new Semaphore(0);
 		numMessageReceivedAcks = 0;
 		numMessageGenerated = 0;
+		terminated = false;
 	}
 
 	public int getId() {
@@ -52,7 +56,6 @@ public class Process {
 		this.id = id;
 	}
 
-	
 	public synchronized LinkedList<Integer> getPendingAcks() {
 		return pendingAcks;
 	}
@@ -164,10 +167,10 @@ public class Process {
 	}
 
 	public void sendAck(int receiverId) {
-		if(receiverId == this.id) {
+		if (receiverId == this.id) {
 			return;
 		}
-		
+
 		Message ack = Message.ackMessage(this.id, this.localTime);
 		Process receiverProcess = allProcessList.get(receiverId);
 		try {
@@ -179,7 +182,6 @@ public class Process {
 			output.close();
 			sock.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -203,6 +205,18 @@ public class Process {
 			sendReady(receiverId);
 		}
 	}
+	
+	private void sendTermination(int receiverId) {
+		Message term = Message.termMessage();
+		sendMessage(receiverId, term);
+	}
+	
+	public void sendTerminationToAll() {
+		for (Entry<Integer, Process> pair : allProcessList.entrySet()) {
+			int receiverId = pair.getKey();
+			sendTermination(receiverId);
+		}
+	}
 
 	/**
 	 * Does the pending acks list contain the specific process
@@ -216,13 +230,21 @@ public class Process {
 	public boolean removeFromPendingAcks(int remoteId) {
 		return pendingAcks.remove(Integer.valueOf(remoteId));
 	}
-	
+
 	public boolean removeFromChildList(int remoteId) {
 		return childList.remove(Integer.valueOf(remoteId));
 	}
-	
+
 	public void addToChildList(int remoteId) {
 		childList.add(Integer.valueOf(remoteId));
+	}
+
+	public void goingToTerminate() {
+		terminated = true;
+	}
+
+	public boolean isTerminated() {
+		return terminated;
 	}
 
 	/**
@@ -232,10 +254,10 @@ public class Process {
 	 * @param message
 	 */
 	private void sendMessage(int receiverId, Message message) {
-		if(receiverId == this.id) {
+		if (receiverId == this.id) {
 			return;
 		}
-		
+
 		Process receiverProcess = allProcessList.get(receiverId);
 		try {
 			Socket sock = new Socket(receiverProcess.getProcessAddr(),
@@ -246,7 +268,6 @@ public class Process {
 			output.close();
 			sock.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -274,51 +295,94 @@ public class Process {
 
 		System.out.println("Everyone is ready: begin computational request");
 		// then go to business logic
-		boolean loop = true;
-		while(loop) {
-			// idle
+		if(id == 1) {
+			// This is initiator
+			activateComputation();
 		}
+		
+		// this keep thread running in a loop
+		computationLoop();
+		
+		return;
 
+		/*
 		try {
 			recvThread.join();
 			acksThread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		*/
+	}
+
+	public void computationLoop() {
+		terminated = false;
+
+		while (!terminated) {
+			try {
+				semAction.acquire();
+				// loop will block here, unless activateComputation called
+
+				semState.acquire();
+				boolean loop = true;
+				Random randTime = new Random();
+				Random randValue = new Random();
+				Random randProcess = new Random();
+				do {
+					double elapseTime = 0.25 + 0.75 * randTime.nextDouble();
+					Thread.sleep((long) (elapseTime * 1000));
+					double value = randValue.nextDouble();
+					if (value < 0.1) {
+						loop = false;
+					} else {
+						int pj = 0;
+						do {
+							pj = 1 + randProcess.nextInt(15); // 1 + [0..14]
+						} while (pj == this.id); // until i != j
+
+						numMessageGenerated++;
+						// add Pj to children list of this process
+						this.addToChildList(pj);
+						// add Pj to pending acks list
+						this.pendingAcks.add(pj);
+						// send computation message to Pj
+						this.sendComputation(pj);
+						Log.sendComputationalMessage(pj, numMessageReceivedAcks);
+					}
+
+				} while (loop && numMessageGenerated < 25);
+
+				// before go to idle, first check whether termination satisfied,
+				// that is, pending acks list is empty
+				if (receiveAllAcks()) {
+					if (id == 1) {
+						goingToTerminate();
+						Log.determineTermination();
+						sendTerminationToAll();
+					} else {
+						// if not the initiator, send ack to parent
+						this.sendAck(parent.getId());
+						Log.sendAckToParentAndDetachFromTree(parent.getId());
+						this.setParent(null);
+					}
+				}
+				semState.release();
+				Log.fromActiveToIdle();
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void activateComputation() {
-		try {
-			semState.acquire();
-			boolean loop = true;
-			Random randTime = new Random();
-			Random randValue = new Random();
-			Random randProcess = new Random();
-			do {
-				double elapseTime = 0.25 + 0.75 * randTime.nextDouble();
-				Thread.sleep((long) (elapseTime * 1000));
-				double value = randValue.nextDouble();
-				if(value < 0.1) {
-					loop = false;
-				} else {
-					int pj = 0;
-					do {
-						pj = 1 + randProcess.nextInt(15); // 1 + [0..14]
-					} while (pj == this.id); // until i != j
-					
-					numMessageGenerated++;
-					// add Pj to children list of this process
-					this.addToChildList(pj);
-					// send computation message to Pj
-					this.sendComputation(pj);
-				}
-				
-			} while (loop && numMessageGenerated < 25);
+		semAction.release();
+	}
 
-			semState.release();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public boolean receiveAllAcks() {
+		if (pendingAcks.size() == 0) {
+			return true;
 		}
+		return false;
 	}
 }

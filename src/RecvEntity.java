@@ -42,7 +42,7 @@ public class RecvEntity implements Runnable {
 	@Override
 	public void run() {
 		try {	
-			while(true) {
+			while(!process.isTerminated()) {
 				Socket clientSock = recvSock.accept();
 				System.out.println("Just connected to "
 		                  + clientSock.getRemoteSocketAddress());
@@ -56,6 +56,7 @@ public class RecvEntity implements Runnable {
 					handleComputationalMessage(message);
 				}
 				if(message.isTermination()) {
+					process.goingToTerminate();
 					Log.receiveTermination();
 					return;
 				}

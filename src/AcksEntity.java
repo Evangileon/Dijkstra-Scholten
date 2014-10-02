@@ -21,7 +21,7 @@ public class AcksEntity implements Runnable {
 		this.process = process;
 	}
 	
-	private boolean checkTermination() {
+	private boolean checkIdleAndAllAcksReceived() {
 		if(!process.getSemState().tryAcquire()) {
 			// process active, not terminated
 			return false;
@@ -40,7 +40,7 @@ public class AcksEntity implements Runnable {
 	@Override
 	public void run() {
 		try {
-			while (true) {
+			while (!process.isTerminated()) {
 				Socket clientSock = acksSock.accept();
 				DataInputStream input = new DataInputStream(
 						clientSock.getInputStream());
@@ -54,14 +54,20 @@ public class AcksEntity implements Runnable {
 						process.removeFromChildList(message.getSenderId());
 						Log.receiveAckMessage(message.getSenderId(), process.getNumMessageReceivedAcks());
 						
-						if(checkTermination()) {
+						if(checkIdleAndAllAcksReceived()) {
 							// satisfy the termination condition for this process
 							// then send ACK to parent;
-							Process parent = process.getParent();
-							process.sendAck(parent.getId());
-							// detach from parent
-							process.setParent(null);
-							Log.sendAckToParentAndDetachFromTree(parent.getId());
+							if(process.getId() == 1) {
+								process.goingToTerminate();
+								Log.determineTermination();
+								process.sendTerminationToAll();
+							} else {
+								Process parent = process.getParent();
+								process.sendAck(parent.getId());
+								// detach from parent
+								process.setParent(null);
+								Log.sendAckToParentAndDetachFromTree(parent.getId());
+							}
 						}
 						
 					} else {

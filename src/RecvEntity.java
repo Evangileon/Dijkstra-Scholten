@@ -28,7 +28,7 @@ public class RecvEntity implements Runnable {
 			process.setParent(process.getAllProcessList().get(remoteId));
 			Log.receiveComputationalMessage(remoteId, true);
 			// TODO then active process
-			
+			process.activateComputation();
 			process.getSemState().release();
 			
 		} else {

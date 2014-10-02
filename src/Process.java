@@ -118,6 +118,9 @@ public class Process {
 		for (int i = 0; i < readyList.length; i++) {
 			readyList[i] = false;
 		}
+		
+		// this process is always ready for itself
+		readyList[this.id] = true;
 
 		try {
 			for (int i = 0; i < READY_TIMEOUT; i++) {
@@ -202,6 +205,9 @@ public class Process {
 	private void sendReadyToAll() {
 		for (Entry<Integer, Process> pair : allProcessList.entrySet()) {
 			int receiverId = pair.getKey();
+			if(receiverId == this.id) {
+				continue;
+			}
 			sendReady(receiverId);
 		}
 	}
@@ -282,6 +288,12 @@ public class Process {
 
 		recvThread.start();
 		acksThread.start();
+		
+		try {
+			Thread.sleep(60 * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		// Tell everyone that online that I am ready
 		sendReadyToAll();
